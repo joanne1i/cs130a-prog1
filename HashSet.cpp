@@ -9,9 +9,15 @@ HashSet::HashSet() {
 	this->strfn2 = new PearsonHash();
 	this->slots = new std::string*[nslots];
 }
+
+HashSet::~HashSet() {
+	delete[] slots;
+}
+
 // double table size, recreate integer hash function based on num of buckets
 // re-insert every item
-/*void HashSet::rehash() {
+void HashSet::rehash() {
+	int index;
 	this->nslots = 2*nslots;
 	this->nitems = 0;
 	std::string** temp = new std::string*[nslots];
@@ -20,13 +26,14 @@ HashSet::HashSet() {
 	// re-inserts every item in new table
 	for(int i = 0; i < sizeof(slots); i++) {
 		while(slots[i] != NULL) {
-			temp[index] = insert(slots[i]);
+			index = intfn->hash(slots[i]);
+			temp[index] = *slots[i];
 		}
 	}
 	delete[] slots;
 	slots = temp;
 
-}*/
+}
 
 void HashSet::insert(const std::string& value) {
 	uint64_t input = strfn->hash(value);
@@ -38,14 +45,19 @@ void HashSet::insert(const std::string& value) {
 		// linear probing
 		while(slots[index] != NULL)
 			index = intfn->hash(input+1);
-		slots[index] = value;
+		*slots[index] = value;
 	}
 
 }
 
 bool HashSet::lookup(const std::string& value) const {
-
-return false;
-
+	uint64_t input = strfn->hash(value);
+	uint64_t index = intfn->hash(input);
+	while(slots[index] != NULL) {
+		if(*slots[index] == value)
+			return true;
+		index = intfn->hash(input+1);
+	}
+	return false;
 }
 
