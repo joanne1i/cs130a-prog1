@@ -3,7 +3,6 @@
 
 HashSet::HashSet() {
 	this->nitems = 0;
-	// will have to resize when nitems == nslots
 	this->nslots = 1000;
 	this->intfn = new SquareRootHash(0, nslots);
 	this->strfn = new JenkinsHash();
@@ -20,10 +19,9 @@ HashSet::~HashSet() {
 	delete intfn;
 }
 
-// double table size, recreate integer hash function based on num of buckets
-// re-insert every item
+// double table size, recreate integer hash function based 
+// on num of buckets re-insert every item
 void HashSet::rehash() {
-	std::cout << "rehash is called" << std::endl;
 	uint64_t index;
 	uint64_t input;
 	this->nslots = 2*nslots;
@@ -49,29 +47,21 @@ void HashSet::rehash() {
 
 void HashSet::insert(const std::string& value) {
 	uint64_t input = strfn->hash(value);
-	// get the index for the value
 	uint64_t index = intfn->hash(input);
 	if(lookup(value) == false) {
 		nitems++;
 		if(nitems >= nslots) {
-		//	std::cout << "rehash is called in insert" << std::endl;
 			rehash();
 			index = intfn->hash(input);
-		//	std::cout << "rehahs is completed" << std::endl;
 		}
-		//std::cout << "lookup completed" << std::endl;
-		// probing
-		
+		// linear probing
 		while(slots[index%nslots] != NULL)
 			index++;
-		//std::cout << "seg fault at hashset insert" << std::endl;
 		slots[index%nslots] = new std::string(value);
-		//std::cout << "it's the slots thing" << std::endl;
 	}
 }
 
 bool HashSet::lookup(const std::string& value) const {
-	//std::cout << "hash set lookup is called" << std::endl;
 	uint64_t input = strfn->hash(value);
 	uint64_t index = intfn->hash(input);
 	while(slots[index%nslots] != NULL) {
@@ -79,7 +69,6 @@ bool HashSet::lookup(const std::string& value) const {
 			return true;
 		index++;
 	}
-	//std::cout << "lookup complete" << std::endl;
 	return false;
 }
 
