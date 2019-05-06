@@ -7,7 +7,7 @@ HashSet::HashSet() {
 	this->nslots = 1000;
 	this->intfn = new SquareRootHash(0, nslots);
 	this->strfn = new JenkinsHash();
-	this->strfn2 = new PearsonHash();
+	this->strfn2 = NULL;
 	this->slots = new std::string*[nslots]();
 }
 
@@ -16,6 +16,8 @@ HashSet::~HashSet() {
 		delete slots[i];
 	}
 	delete[] slots;
+	delete strfn;
+	delete intfn;
 }
 
 // double table size, recreate integer hash function based on num of buckets
